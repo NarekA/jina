@@ -197,15 +197,19 @@ class HTTPClientlet(AioHttpClientlet):
         :param on: Request endpoint
         :yields: responses
         """
-        req_dict = doc.json()
+        if docarray_v2:
+            req_dict = doc.dict()
+        else:
+            req_dict = doc.to_dict()
 
         request_kwargs = {
             'url': self.url,
             'headers': {'Accept': 'text/event-stream'},
         }
-        request_kwargs['data'] = req_dict
+        req_dict = {key: value for key, value in req_dict.items() if value is not None}
+        request_kwargs['params'] = req_dict
 
-        async with self.session.post(**request_kwargs) as response:
+        async with self.session.get(**request_kwargs) as response:
             async for chunk in response.content.iter_any():
                 events = chunk.split(b'event: ')[1:]
                 for event in events:
