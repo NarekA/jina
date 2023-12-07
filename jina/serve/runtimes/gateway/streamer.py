@@ -209,6 +209,7 @@ class GatewayStreamer:
         exec_endpoint: Optional[str] = None,
         target_executor: Optional[str] = None,
         parameters: Optional[Dict] = None,
+        metadata: Optional[Dict] = None,
         results_in_order: bool = False,
         return_type: Type[DocumentArray] = DocumentArray,
     ) -> AsyncIterator[Tuple[Union[DocumentArray, 'Request'], 'ExecutorError']]:
@@ -232,6 +233,7 @@ class GatewayStreamer:
             exec_endpoint=exec_endpoint,
             target_executor=target_executor,
             parameters=parameters,
+            metadata=metadata,
             results_in_order=results_in_order,
             return_type=return_type,
         ):
@@ -256,6 +258,7 @@ class GatewayStreamer:
         exec_endpoint: Optional[str] = None,
         target_executor: Optional[str] = None,
         parameters: Optional[Dict] = None,
+        metadata: Optional[Dict] = None,
         request_id: Optional[str] = None,
         return_type: Type[DocumentArray] = DocumentArray,
     ) -> AsyncIterator[Tuple[Union[DocumentArray, 'Request'], 'ExecutorError']]:
@@ -267,6 +270,7 @@ class GatewayStreamer:
         :param exec_endpoint: The Executor endpoint to which to send the Documents
         :param target_executor: A regex expression indicating the Executors that should receive the Request
         :param parameters: Parameters to be attached to the Requests
+        :param metadata: Request headers
         :param request_id: Request ID to add to the request streamed to Executor. Only applicable if request_size is equal or less to the length of the docs
         :param return_type: the DocumentArray type to be returned. By default, it is `DocumentArray`.
         :yield: tuple of Documents or Responses and unpacked error from Executors if any
@@ -282,6 +286,8 @@ class GatewayStreamer:
             req.header.target_executor = target_executor
         if parameters:
             req.parameters = parameters
+        if metadata:
+            req.metadata = metadata
 
         async for result in self.rpc_stream_doc(request=req, return_type=return_type):
             error = None
@@ -306,6 +312,7 @@ class GatewayStreamer:
         exec_endpoint: Optional[str] = None,
         target_executor: Optional[str] = None,
         parameters: Optional[Dict] = None,
+        metadata: Optional[Dict] = None,
         results_in_order: bool = False,
         request_id: Optional[str] = None,
         return_type: Type[DocumentArray] = DocumentArray,
@@ -339,6 +346,8 @@ class GatewayStreamer:
                         req.header.target_executor = target_executor
                     if parameters:
                         req.parameters = parameters
+                    if metadata:
+                        req.metadata = metadata
                     yield req
             else:
                 from docarray import BaseDoc
@@ -361,6 +370,8 @@ class GatewayStreamer:
                             req.header.target_executor = target_executor
                         if parameters:
                             req.parameters = parameters
+                        if metadata:
+                            req.metadata = metadata
                         yield req
                 else:
                     req = DataRequest()
@@ -374,6 +385,8 @@ class GatewayStreamer:
                         req.header.target_executor = target_executor
                     if parameters:
                         req.parameters = parameters
+                    if metadata:
+                        req.metadata = metadata
                     yield req
 
         async for resp in self.rpc_stream(
@@ -438,6 +451,7 @@ class _ExecutorStreamer:
         request_size: int = 100,
         on: Optional[str] = None,
         parameters: Optional[Dict] = None,
+        metadata: Optional[Dict] = None,
         return_type: Type[DocumentArray] = DocumentArray,
         **kwargs,
     ):
@@ -505,6 +519,7 @@ class _ExecutorStreamer:
         inputs: 'Document',
         on: Optional[str] = None,
         parameters: Optional[Dict] = None,
+        metadata: Optional[Dict] = None,
         **kwargs,
     ):
         req: SingleDocumentRequest = SingleDocumentRequest(inputs.to_protobuf())

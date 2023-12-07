@@ -187,8 +187,10 @@ def get_fastapi_app(
         )
         app_kwargs['response_class'] = DocArrayResponse
 
+        from fastapi import Request
+
         @app.api_route(**app_kwargs)
-        async def post(body: input_model, response: Response):
+        async def post(body: input_model, response: Response, request: Request):
             target_executor = None
             req_id = None
             if body.header is not None:
@@ -208,6 +210,11 @@ def get_fastapi_app(
                     docs,
                     exec_endpoint=endpoint_path,
                     parameters=body.parameters,
+                    metadata=dict(
+                        request.headers or {
+                            "no_headers": "true"
+                        }
+                    ),
                     target_executor=target_executor,
                     request_id=req_id,
                     return_results=True,
@@ -245,8 +252,6 @@ def get_fastapi_app(
         endpoint_path,
         input_doc_model=None,
     ):
-        from fastapi import Request
-
         @app.api_route(
             path=f'/{endpoint_path.strip("/")}',
             methods=['GET'],

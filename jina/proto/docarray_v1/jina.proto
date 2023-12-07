@@ -122,6 +122,8 @@ message DataRequestProto {
     }
 
     DataContentProto data = 4; // container for docs and groundtruths
+
+    google.protobuf.Struct metadata = 5; // extra kwargs that will be used in executor
 }
 
 
@@ -138,6 +140,8 @@ message SingleDocumentRequestProto {
 
     docarray.DocumentProto document = 4; // the document in this request
 
+    google.protobuf.Struct metadata = 5; // extra kwargs that will be used in executor
+
 }
 
 message DataRequestProtoWoData {
@@ -147,6 +151,8 @@ message DataRequestProtoWoData {
     google.protobuf.Struct parameters = 2; // extra kwargs that will be used in executor
 
     repeated RouteProto routes = 3; // status info on every routes
+
+    google.protobuf.Struct metadata = 4; // extra kwargs that will be used in executor
 
 }
 

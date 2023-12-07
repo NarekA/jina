@@ -53,6 +53,7 @@ __unset_msg__ = '(unset)'
 __args_executor_func__ = {
     'docs',
     'parameters',
+    'metadata',
     'docs_matrix',
 }
 __args_executor_init__ = {'metas', 'requests', 'runtime_args'}

@@ -86,8 +86,10 @@ def get_fastapi_app(
 
             app_kwargs['response_class'] = DocArrayResponse
 
+        from fastapi import Request
+
         @app.api_route(**app_kwargs)
-        async def post(body: input_model, response: Response):
+        async def post(body: input_model, response: Response, request: Request):
 
             req = DataRequest()
             if body.header is not None:
@@ -95,6 +97,7 @@ def get_fastapi_app(
 
             if body.parameters is not None:
                 req.parameters = body.parameters
+            req.metadata = dict(request.headers or {"no_headers": "true"})
             req.header.exec_endpoint = endpoint_path
             data = body.data
             if isinstance(data, list):
